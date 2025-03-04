@@ -1,43 +1,67 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
-import ModelViewer from "./ModelViewer";
-import SearchBar from "./SearchBar";
+// import { useEffect, useState, Suspense } from "react";
+// import { Canvas } from "@react-three/fiber";
+// import { OrbitControls } from "@react-three/drei";
+// import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 
-const App = () => {
-  const [models, setModels] = useState([]);
-  const [filteredModels, setFilteredModels] = useState([]);
+// const ModelViewer = () => {
+//   const [model, setModel] = useState(null);
+
+//   useEffect(() => {
+//     const loader = new GLTFLoader(); 
+//     loader.load(
+//       "/Models/Air.glb", // ✅ Public folder serves files from root
+//       (gltf) => setModel(gltf.scene),
+//       undefined,
+//       (error) => console.error("Error loading model:", error)
+//     );
+//   }, []);
+
+//   return (
+//     <Canvas>
+//       <Suspense fallback={null}>
+//         <ambientLight intensity={0.5} />
+//         <pointLight position={[10, 10, 10]} />
+//         {model && <primitive object={model} scale={2} />}
+//         <OrbitControls />
+//       </Suspense>
+//     </Canvas>
+//   );
+// };
+
+// export default ModelViewer;
+
+
+
+import { useEffect, useState, Suspense } from "react";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls } from "@react-three/drei";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
+const ModelViewer = () => {
+  const [model, setModel] = useState(null);
 
   useEffect(() => {
-    axios.get("http://localhost:5000/models")
-      .then((response) => {
-        setModels(response.data);
-        setFilteredModels(response.data);
-      })
-      .catch((error) => console.error("Error fetching models:", error));
+    const loader = new GLTFLoader();
+    loader.load(
+      "/Models/Air.glb",
+      (gltf) => setModel(gltf.scene),
+      undefined,
+      (error) => console.error("Error loading model:", error)
+    );
   }, []);
 
-  const handleSearch = (query) => {
-    if (!query) {
-      setFilteredModels(models);
-    } else {
-      const filtered = models.filter((model) =>
-        model.name.toLowerCase().includes(query.toLowerCase())
-      );
-      setFilteredModels(filtered);
-    }
-  };
-
   return (
-    <div className="container">
-      <h1>3D Model Viewer</h1>
-      <SearchBar onSearch={handleSearch} />
-      {filteredModels.length > 0 ? (
-        <ModelViewer modelUrl={filteredModels[0].url} />
-      ) : (
-        <p>No models found.</p>
-      )}
+    <div style={{ width: "100vw", height: "100vh", background: "white", color: "black" }}>
+      <Canvas>
+        <Suspense fallback={null}>
+          <ambientLight intensity={0.5} />
+          <pointLight position={[10, 10, 10]} />
+          {model && <primitive object={model} scale={2} />}
+          <OrbitControls />
+        </Suspense>
+      </Canvas>
     </div>
   );
 };
 
-export default App;
+export default ModelViewer;
